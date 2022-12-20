@@ -2,6 +2,4 @@ resources:
   - 01-review-manager.viper.yaml
   - 02-review-manager.yaml
   - 03-strip-prefix.yaml
-  - 04-traefik-ingress.yaml
-  - 05-traefik-vpn-ingress.yaml
-  - 06-service-monitor.yaml
+  - 04-service-monitor.yaml
