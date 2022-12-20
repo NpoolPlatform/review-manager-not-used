@@ -109,6 +109,9 @@ func CreateBulk(ctx context.Context, in []*npool.ReviewReq) ([]*ent.Review, erro
 func UpdateSet(info *ent.Review, in *npool.ReviewReq) (*ent.ReviewUpdateOne, error) {
 	stm := info.Update()
 
+	if in.ReviewerID != nil {
+		stm = stm.SetReviewerID(uuid.MustParse(in.GetReviewerID()))
+	}
 	if in.State != nil {
 		switch info.State {
 		case npool.ReviewState_Wait.String():

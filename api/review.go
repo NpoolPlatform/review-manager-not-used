@@ -140,6 +140,10 @@ func (s *Server) UpdateReview(ctx context.Context, in *npool.UpdateReviewRequest
 		logger.Sugar().Errorw("UpdateReview", "ID", in.GetInfo().GetID(), "error", err)
 		return &npool.UpdateReviewResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
+	if _, err := uuid.Parse(in.GetInfo().GetReviewerID()); err != nil {
+		logger.Sugar().Errorw("UpdateReview", "ReviewerID", in.GetInfo().GetReviewerID(), "error", err)
+		return &npool.UpdateReviewResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
 	if in.GetInfo().State != nil && in.GetInfo().GetState() == npool.ReviewState_Rejected {
 		if in.GetInfo().GetMessage() == "" {
 			logger.Sugar().Errorw("UpdateReview", "Message", in.GetInfo().GetMessage())
