@@ -1,5 +1,5 @@
 //nolint:dupl
-package detail
+package review
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	npool "github.com/NpoolPlatform/message/npool/servicetmpl/detail"
+	npool "github.com/NpoolPlatform/message/npool/review/mgr/v2"
 
 	constant "github.com/NpoolPlatform/review-manager/pkg/message/const"
 )
@@ -24,7 +24,7 @@ func withCRUD(ctx context.Context, handler handler) (cruder.Any, error) {
 
 	conn, err := grpc2.GetGRPCConn(constant.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
-		return nil, fmt.Errorf("fail get detail connection: %v", err)
+		return nil, fmt.Errorf("fail get review connection: %v", err)
 	}
 
 	defer conn.Close()
@@ -34,134 +34,149 @@ func withCRUD(ctx context.Context, handler handler) (cruder.Any, error) {
 	return handler(_ctx, cli)
 }
 
-func CreateDetail(ctx context.Context, in *npool.DetailReq) (*npool.Detail, error) {
+func CreateReview(ctx context.Context, in *npool.ReviewReq) (*npool.Review, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.ManagerClient) (cruder.Any, error) {
-		resp, err := cli.CreateDetail(ctx, &npool.CreateDetailRequest{
+		resp, err := cli.CreateReview(ctx, &npool.CreateReviewRequest{
 			Info: in,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("fail create detail: %v", err)
+			return nil, fmt.Errorf("fail create review: %v", err)
 		}
 		return resp.GetInfo(), nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("fail create detail: %v", err)
+		return nil, fmt.Errorf("fail create review: %v", err)
 	}
-	return info.(*npool.Detail), nil
+	return info.(*npool.Review), nil
 }
 
-func CreateDetails(ctx context.Context, in []*npool.DetailReq) ([]*npool.Detail, error) {
+func CreateReviews(ctx context.Context, in []*npool.ReviewReq) ([]*npool.Review, error) {
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.ManagerClient) (cruder.Any, error) {
-		resp, err := cli.CreateDetails(ctx, &npool.CreateDetailsRequest{
+		resp, err := cli.CreateReviews(ctx, &npool.CreateReviewsRequest{
 			Infos: in,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("fail create details: %v", err)
+			return nil, fmt.Errorf("fail create reviews: %v", err)
 		}
 		return resp.GetInfos(), nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("fail create details: %v", err)
+		return nil, fmt.Errorf("fail create reviews: %v", err)
 	}
-	return infos.([]*npool.Detail), nil
+	return infos.([]*npool.Review), nil
 }
 
-func GetDetail(ctx context.Context, id string) (*npool.Detail, error) {
+func UpdateReview(ctx context.Context, in *npool.ReviewReq) (*npool.Review, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.ManagerClient) (cruder.Any, error) {
-		resp, err := cli.GetDetail(ctx, &npool.GetDetailRequest{
+		resp, err := cli.UpdateReview(ctx, &npool.UpdateReviewRequest{
+			Info: in,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("fail create review: %v", err)
+		}
+		return resp.GetInfo(), nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail create review: %v", err)
+	}
+	return info.(*npool.Review), nil
+}
+func GetReview(ctx context.Context, id string) (*npool.Review, error) {
+	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.ManagerClient) (cruder.Any, error) {
+		resp, err := cli.GetReview(ctx, &npool.GetReviewRequest{
 			ID: id,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("fail get detail: %v", err)
+			return nil, fmt.Errorf("fail get review: %v", err)
 		}
 		return resp.GetInfo(), nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("fail get detail: %v", err)
+		return nil, fmt.Errorf("fail get review: %v", err)
 	}
-	return info.(*npool.Detail), nil
+	return info.(*npool.Review), nil
 }
 
-func GetDetailOnly(ctx context.Context, conds *npool.Conds) (*npool.Detail, error) {
+func GetReviewOnly(ctx context.Context, conds *npool.Conds) (*npool.Review, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.ManagerClient) (cruder.Any, error) {
-		resp, err := cli.GetDetailOnly(ctx, &npool.GetDetailOnlyRequest{
+		resp, err := cli.GetReviewOnly(ctx, &npool.GetReviewOnlyRequest{
 			Conds: conds,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("fail get detail: %v", err)
+			return nil, fmt.Errorf("fail get review: %v", err)
 		}
 		return resp.GetInfo(), nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("fail get detail: %v", err)
+		return nil, fmt.Errorf("fail get review: %v", err)
 	}
-	return info.(*npool.Detail), nil
+	return info.(*npool.Review), nil
 }
 
-func GetDetails(ctx context.Context, conds *npool.Conds, limit, offset int32) ([]*npool.Detail, uint32, error) {
+func GetReviews(ctx context.Context, conds *npool.Conds, limit, offset int32) ([]*npool.Review, uint32, error) {
 	var total uint32
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.ManagerClient) (cruder.Any, error) {
-		resp, err := cli.GetDetails(ctx, &npool.GetDetailsRequest{
+		resp, err := cli.GetReviews(ctx, &npool.GetReviewsRequest{
 			Conds:  conds,
 			Limit:  limit,
 			Offset: offset,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("fail get details: %v", err)
+			return nil, fmt.Errorf("fail get reviews: %v", err)
 		}
 		total = resp.GetTotal()
 		return resp.GetInfos(), nil
 	})
 	if err != nil {
-		return nil, 0, fmt.Errorf("fail get details: %v", err)
+		return nil, 0, fmt.Errorf("fail get reviews: %v", err)
 	}
-	return infos.([]*npool.Detail), total, nil
+	return infos.([]*npool.Review), total, nil
 }
 
-func ExistDetail(ctx context.Context, id string) (bool, error) {
+func ExistReview(ctx context.Context, id string) (bool, error) {
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.ManagerClient) (cruder.Any, error) {
-		resp, err := cli.ExistDetail(ctx, &npool.ExistDetailRequest{
+		resp, err := cli.ExistReview(ctx, &npool.ExistReviewRequest{
 			ID: id,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("fail get detail: %v", err)
+			return nil, fmt.Errorf("fail get review: %v", err)
 		}
 		return resp.GetInfo(), nil
 	})
 	if err != nil {
-		return false, fmt.Errorf("fail get detail: %v", err)
+		return false, fmt.Errorf("fail get review: %v", err)
 	}
 	return infos.(bool), nil
 }
 
-func ExistDetailConds(ctx context.Context, conds *npool.Conds) (bool, error) {
+func ExistReviewConds(ctx context.Context, conds *npool.Conds) (bool, error) {
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.ManagerClient) (cruder.Any, error) {
-		resp, err := cli.ExistDetailConds(ctx, &npool.ExistDetailCondsRequest{
+		resp, err := cli.ExistReviewConds(ctx, &npool.ExistReviewCondsRequest{
 			Conds: conds,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("fail get detail: %v", err)
+			return nil, fmt.Errorf("fail get review: %v", err)
 		}
 		return resp.GetInfo(), nil
 	})
 	if err != nil {
-		return false, fmt.Errorf("fail get detail: %v", err)
+		return false, fmt.Errorf("fail get review: %v", err)
 	}
 	return infos.(bool), nil
 }
 
-func CountDetails(ctx context.Context, conds *npool.Conds) (uint32, error) {
+func CountReviews(ctx context.Context, conds *npool.Conds) (uint32, error) {
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.ManagerClient) (cruder.Any, error) {
-		resp, err := cli.CountDetails(ctx, &npool.CountDetailsRequest{
+		resp, err := cli.CountReviews(ctx, &npool.CountReviewsRequest{
 			Conds: conds,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("fail count detail: %v", err)
+			return nil, fmt.Errorf("fail count review: %v", err)
 		}
 		return resp.GetInfo(), nil
 	})
 	if err != nil {
-		return 0, fmt.Errorf("fail count detail: %v", err)
+		return 0, fmt.Errorf("fail count review: %v", err)
 	}
 	return infos.(uint32), nil
 }

@@ -106,17 +106,22 @@ func CreateBulk(ctx context.Context, in []*npool.ReviewReq) ([]*ent.Review, erro
 	return rows, nil
 }
 
-func UpdateSet(info *ent.Review, in *npool.ReviewReq) *ent.ReviewUpdateOne {
+func UpdateSet(info *ent.Review, in *npool.ReviewReq) (*ent.ReviewUpdateOne, error) {
 	stm := info.Update()
 
 	if in.State != nil {
+		switch info.State {
+		case npool.ReviewState_Wait.String():
+		default:
+			return nil, fmt.Errorf("permission denied")
+		}
 		stm = stm.SetState(in.GetState().String())
 	}
 	if in.Message != nil {
 		stm = stm.SetMessage(in.GetMessage())
 	}
 
-	return stm
+	return stm, nil
 }
 
 func Update(ctx context.Context, in *npool.ReviewReq) (*ent.Review, error) {
@@ -135,13 +140,17 @@ func Update(ctx context.Context, in *npool.ReviewReq) (*ent.Review, error) {
 
 	span = tracer.Trace(span, in)
 
-	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		info, err = cli.Review.Query().Where(review.ID(uuid.MustParse(in.GetID()))).ForUpdate().Only(_ctx)
+	err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		info, err = tx.Review.Query().Where(review.ID(uuid.MustParse(in.GetID()))).ForUpdate().Only(_ctx)
 		if err != nil {
 			return fmt.Errorf("fail query review: %v", err)
 		}
 
-		c := UpdateSet(info, in)
+		c, err := UpdateSet(info, in)
+		if err != nil {
+			return err
+		}
+
 		info, err = c.Save(_ctx)
 		return err
 	})
