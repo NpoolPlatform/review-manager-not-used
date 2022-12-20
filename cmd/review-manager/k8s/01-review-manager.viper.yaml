@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: review-manager-config
+  namespace: kube-system
+data:
+  service-conf: |
+    config:
+      hostname: "review-manager.npool.top"
+      http_port: 50650
+      grpc_port: 50651
+      healthz_port: 50652
+      prometheus_port: 50653
+      appid: "89089012783789789719823798127398"
+      serviceid: "220e564c-8036-11ed-a583-1e0b0807e20c"
+      logdir: "./"
+      apolloAccessKey: "0147fb70b815403790e8634b899fac07"

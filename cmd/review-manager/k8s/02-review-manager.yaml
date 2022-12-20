@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-manager
+  namespace: kube-system
+  annotations:
+    "sidecar.jaegertracing.io/inject": "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: review-manager
+  template:
+    metadata:
+      labels:
+        app: review-manager
+    spec:
+      containers:
+        - name: review-manager
+          image: uhub.service.ucloud.cn/entropypool/review-manager:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: service-config
+              mountPath: /etc/ReviewManager
+          env:
+            - name: ENV_ENVIRONMENT_TARGET
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.target
+            - name: ENV_CONSUL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.consul_host
+            - name: ENV_CONSUL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.consul_port
+            - name: ENV_CLUSTER_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      volumes:
+        - name: service-config
+          configMap:
+            name: review-manager-config
+            items:
+              - key: service-conf
+                path: ReviewManager.viper.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: review-manager
+  namespace: kube-system
+spec:
+  ports:
+    - name: http
+      port: 50650
+      targetPort: 50650
+    - name: grpc
+      port: 50651
+      targetPort: 50651
+    - name: healthz
+      port: 50652
+      targetPort: 50652
+    - name: prometheus
+      port: 50653
+      targetPort: 50653
+  selector:
+    app: review-manager
