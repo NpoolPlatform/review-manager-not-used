@@ -32,8 +32,10 @@ func ValidateCreate(in *npool.ReviewReq) error {
 	if _, err := uuid.Parse(in.GetAppID()); err != nil {
 		return err
 	}
-	if _, err := uuid.Parse(in.GetReviewerID()); err != nil {
-		return err
+	if in.GetReviewerID != nil {
+		if _, err := uuid.Parse(in.GetReviewerID()); err != nil {
+			return err
+		}
 	}
 	if in.GetDomain() == "" {
 		return fmt.Errorf("invalid domain")
