@@ -32,8 +32,8 @@ func ValidateCreate(in *npool.ReviewReq) error {
 	if _, err := uuid.Parse(in.GetAppID()); err != nil {
 		return err
 	}
-	if in.GetReviewerID != nil {
-		if _, err := uuid.Parse(in.GetReviewerID()); err != nil {
+	if in.ReviewerID != nil {
+		if _, err := uuid.Parse(in.ReviewerID()); err != nil {
 			return err
 		}
 	}
