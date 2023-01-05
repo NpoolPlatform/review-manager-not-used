@@ -33,7 +33,7 @@ func ValidateCreate(in *npool.ReviewReq) error {
 		return err
 	}
 	if in.ReviewerID != nil {
-		if _, err := uuid.Parse(in.ReviewerID()); err != nil {
+		if _, err := uuid.Parse(in.GetReviewerID()); err != nil {
 			return err
 		}
 	}
