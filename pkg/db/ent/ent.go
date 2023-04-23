@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/NpoolPlatform/review-manager/pkg/db/ent/pubsubmessage"
 	"github.com/NpoolPlatform/review-manager/pkg/db/ent/review"
 )
 
@@ -31,7 +32,8 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		review.Table: review.ValidColumn,
+		pubsubmessage.Table: pubsubmessage.ValidColumn,
+		review.Table:        review.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

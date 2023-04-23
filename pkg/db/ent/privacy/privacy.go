@@ -150,6 +150,30 @@ func DenyMutationOperationRule(op ent.Op) MutationRule {
 	return OnMutationOperation(rule, op)
 }
 
+// The PubsubMessageQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type PubsubMessageQueryRuleFunc func(context.Context, *ent.PubsubMessageQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f PubsubMessageQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.PubsubMessageQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.PubsubMessageQuery", q)
+}
+
+// The PubsubMessageMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type PubsubMessageMutationRuleFunc func(context.Context, *ent.PubsubMessageMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f PubsubMessageMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.PubsubMessageMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.PubsubMessageMutation", m)
+}
+
 // The ReviewQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type ReviewQueryRuleFunc func(context.Context, *ent.ReviewQuery) error
@@ -209,6 +233,8 @@ var _ QueryMutationRule = FilterFunc(nil)
 
 func queryFilter(q ent.Query) (Filter, error) {
 	switch q := q.(type) {
+	case *ent.PubsubMessageQuery:
+		return q.Filter(), nil
 	case *ent.ReviewQuery:
 		return q.Filter(), nil
 	default:
@@ -218,6 +244,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 
 func mutationFilter(m ent.Mutation) (Filter, error) {
 	switch m := m.(type) {
+	case *ent.PubsubMessageMutation:
+		return m.Filter(), nil
 	case *ent.ReviewMutation:
 		return m.Filter(), nil
 	default:
